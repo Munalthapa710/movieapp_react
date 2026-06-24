@@ -1,8 +1,10 @@
 import "../css/MovieCard.css"
 import { useMovieContext } from "../contexts/MovieContext"
+import { useNavigate } from "react-router-dom"
 
 function MovieCard({movie}) {
     const {isFavorite, addToFavorites, removeFromFavorites} = useMovieContext()
+    const navigate = useNavigate()
     const favorite = isFavorite(movie.id)
 
     function onFavoriteClick(e) {
@@ -12,7 +14,24 @@ function MovieCard({movie}) {
         else addToFavorites(movie)
     }
 
-    return <div className="movie-card">
+    function openMovieDetails() {
+        navigate(`/movie/${movie.id}`)
+    }
+
+    function onCardKeyDown(e) {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            openMovieDetails()
+        }
+    }
+
+    return <div
+        className="movie-card"
+        role="link"
+        tabIndex="0"
+        onClick={openMovieDetails}
+        onKeyDown={onCardKeyDown}
+    >
         <div className="movie-poster">
             <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title}/>
             
@@ -54,10 +73,10 @@ function MovieCard({movie}) {
                         </div>
                     )}
                     <div className="action-buttons">
-                        <button className="play-btn" title="Play Trailer">
+                        <button className="play-btn" title="Play Trailer" type="button">
                             ▶️ Play
                         </button>
-                        <button className="info-btn" title="More Info">
+                        <button className="info-btn" title="More Info" type="button">
                             ℹ️ Info
                         </button>
                     </div>

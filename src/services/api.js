@@ -38,6 +38,47 @@ export const searchMovies = async (query) => {
   }
 };
 
+export const getMovieDetails = async (movieId) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&append_to_response=credits,videos`
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    const sampleMovie = getSampleMovies().find(movie => movie.id === Number(movieId));
+    if (!sampleMovie) {
+      throw error;
+    }
+
+    return {
+      ...sampleMovie,
+      runtime: null,
+      genres: sampleMovie.genre_ids.map(id => ({ id, name: getGenreName(id) })),
+      tagline: "",
+      status: "Released",
+      credits: { cast: [] },
+      videos: { results: [] }
+    };
+  }
+};
+
+const getGenreName = (id) => {
+  const genres = {
+    28: "Action",
+    35: "Comedy",
+    80: "Crime",
+    18: "Drama",
+    53: "Thriller",
+    878: "Science Fiction"
+  };
+
+  return genres[id] || "Movie";
+};
+
 // Fallback sample data in case API fails
 const getSampleMovies = () => [
   {
